@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSM Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7fe; }
+        .glass { background: rgba(255, 255, 255, 0.95); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .sidebar { transition: 0.4s; width: 0; position: fixed; left: 0; top: 0; height: 100%; background: #0f172a; z-index: 1000; overflow: hidden; }
+        .sidebar.active { width: 280px; }
+        .hidden-section { display: none; }
+        input, select { border: 1px solid #e2e8f0; outline: none; transition: 0.3s; }
+        input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        @media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body>
+
+    <section id="login-page" class="h-screen flex flex-col justify-center items-center">
+        <div class="glass p-10 w-full max-w-md text-center border">
+            <h1 class="text-xl font-bold text-blue-600">Develop Software Management</h1>
+            <h2 class="text-md font-semibold mt-2 mb-8 text-gray-400">ADMIN PORTAL</h2>
+            <input type="text" id="login-id" placeholder="Enter the ID" class="w-full p-4 mb-4 rounded-xl text-center">
+            <input type="password" id="login-pass" placeholder="Enter the Password" class="w-full p-4 mb-6 rounded-xl text-center">
+            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg">Login</button>
+        </div>
+        <footer class="mt-8 text-sm text-gray-500">© 2026 Develop Software Management Portal. Develop By <span class="text-black font-bold">ASIF</span></footer>
+    </section>
+
+    <div id="sidebar" class="sidebar flex flex-col text-white">
+        <div class="p-8 text-center border-b border-gray-800"><h2 class="text-2xl font-bold">DSM Portal</h2></div>
+        <nav class="flex-grow p-6 space-y-4">
+            <button onclick="navTo('reg')" class="w-full text-left p-3 hover:bg-blue-600 rounded-lg flex items-center"><i class="fas fa-plus-circle mr-3"></i> Software Registration</button>
+            <button onclick="navTo('list')" class="w-full text-left p-3 hover:bg-blue-600 rounded-lg flex items-center"><i class="fas fa-database mr-3"></i> Software Data List</button>
+            <button onclick="navTo('search')" class="w-full text-left p-3 hover:bg-blue-600 rounded-lg flex items-center"><i class="fas fa-search mr-3"></i> Software Search</button>
+            <button onclick="navTo('user')" class="w-full text-left p-3 hover:bg-blue-600 rounded-lg flex items-center"><i class="fas fa-user mr-3"></i> User Account</button>
+            <button onclick="location.reload()" class="w-full text-left p-3 hover:bg-red-600 rounded-lg mt-10 flex items-center"><i class="fas fa-power-off mr-3"></i> Logout</button>
+        </nav>
+        <div class="p-6 text-center text-xs text-gray-500 italic">© 2026 DSM Portal. Develop By <span class="text-white font-bold">ASIF</span></div>
+    </div>
+
+    <main id="main-portal" class="hidden-section">
+        <header class="bg-white p-4 shadow-sm flex items-center no-print">
+            <button onclick="toggleSidebar()" class="text-2xl ml-2"><i class="fas fa-bars"></i></button>
+            <div class="flex-grow text-center"><h1 class="text-lg font-bold text-blue-800">Develop Software Management</h1></div>
+            <button onclick="navTo('dash')" class="text-xl mr-2 text-blue-600"><i class="fas fa-home"></i></button>
+        </header>
+
+        <div class="p-6">
+            <section id="dash-sec" class="text-center">
+                <h2 class="text-xl text-gray-500 mb-6">Welcome to Develop Software Management</h2>
+                <div class="glass max-w-sm mx-auto p-8 border border-blue-50 mb-8">
+                    <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 border-4 border-white shadow-sm overflow-hidden"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"></div>
+                    <h3 id="display-name" class="text-xl font-bold">ASIF Software Developer</h3>
+                </div>
+                <div class="glass max-w-md mx-auto p-6">
+                    <h4 id="cal-date" class="font-bold text-blue-600 mb-4"></h4>
+                    <div id="cal-grid" class="grid grid-cols-7 gap-2 text-sm font-medium text-gray-600"></div>
+                </div>
+            </section>
+
+            <section id="reg-sec" class="hidden-section max-w-2xl mx-auto glass p-8">
+                <h2 class="text-xl font-bold text-center mb-6">Develop Software Management</h2>
+                <div class="space-y-4">
+                    <input type="text" id="r-sw-name" placeholder="Enter The Software Name" class="w-full p-3 rounded-lg">
+                    <input type="text" id="r-co-name" placeholder="Enter The school Or Company Name" class="w-full p-3 rounded-lg">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="date" id="r-dev-date" class="p-3 rounded-lg">
+                        <input type="date" id="r-host-date" class="p-3 rounded-lg">
+                    </div>
+                    <input type="text" id="r-db-name" placeholder="Enter The Database Name" class="w-full p-3 rounded-lg">
+                    <select id="r-type" onchange="checkType()" class="w-full p-3 rounded-lg">
+                        <option value="">Select Software Type</option>
+                        <option value="Website">Website</option>
+                        <option value="webApp">webApp</option>
+                        <option value="Android App">Android App</option>
+                    </select>
+                    <input type="text" id="r-link" placeholder="Enter The Software Domain or Link" class="hidden w-full p-3 border-blue-300 rounded-lg">
+                    <input type="text" id="r-dev-name" placeholder="Enter The Developer Name" class="w-full p-3 rounded-lg">
+                    <button onclick="saveData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition">Software Registration</button>
+                </div>
+            </section>
+
+            <section id="list-sec" class="hidden-section">
+                <div class="no-print flex gap-4 mb-6">
+                    <input type="text" id="l-search" onkeyup="filterTable()" placeholder="Search by name or company..." class="flex-grow p-3 rounded-lg glass border">
+                    <button onclick="window.print()" class="bg-blue-600 text-white px-6 rounded-lg font-bold">Print List</button>
+                </div>
+                <div id="print-area" class="glass overflow-x-auto bg-white p-4">
+                    <div class="hidden print-only text-center mb-6">
+                        <h1 class="text-2xl font-bold">Develop Software Management</h1>
+                        <h2 class="text-lg">Software Details List</h2>
+                    </div>
+                    <table class="w-full text-center border-collapse">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="p-3 border">SN</th>
+                                <th class="p-3 border">Software Name</th>
+                                <th class="p-3 border">School/Company</th>
+                                <th class="p-3 border">Type</th>
+                                <th class="p-3 border">Domain/Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-tbody" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="search-sec" class="hidden-section max-w-4xl mx-auto">
+                <div class="glass p-8 text-center no-print mb-6">
+                    <div class="flex gap-2">
+                        <input type="text" id="s-query" placeholder="Enter Software or Company Name..." class="w-full p-3 rounded-lg">
+                        <button onclick="detailedSearch()" class="bg-blue-600 text-white px-8 rounded-lg font-bold">Search</button>
+                    </div>
+                </div>
+                <div id="s-result" class="hidden glass p-10 bg-white border">
+                    <h1 class="text-2xl font-bold text-center mb-6">Develop Software Management</h1>
+                    <div id="s-info" class="space-y-4 border-y py-8 text-lg"></div>
+                    <div class="flex justify-center gap-4 mt-8 no-print">
+                        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Print</button>
+                        <button onclick="editData()" class="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold">Editing</button>
+                        <button onclick="deleteData()" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold">Delete</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="user-sec" class="hidden-section max-w-md mx-auto glass p-10 text-center">
+                <h2 class="text-xl font-bold text-gray-800 mb-8">Develop Software Management</h2>
+                <input type="text" id="u-name" placeholder="Enter The Name" class="w-full p-4 rounded-xl mb-6 text-center border-2">
+                <button onclick="saveUser()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:shadow-lg">Save</button>
+            </section>
+
+            <footer class="mt-20 text-center text-sm text-gray-400 no-print">
+                © 2026 Develop Software Management Portal. Develop By <span class="text-black font-bold">ASIF</span>
+            </footer>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtryKXQIpSw6LzLLnPWtJZqU0_e9WjbmM",
+            authDomain: "develop-software-management.firebaseapp.com",
+            databaseURL: "https://develop-software-management-default-rtdb.firebaseio.com",
+            projectId: "develop-software-management",
+            storageBucket: "develop-software-management.firebasestorage.app",
+            messagingSenderId: "509748460797",
+            appId: "1:509748460797:web:66ffa14701991df97ed294"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Global functions for buttons
+        window.saveData = function() {
+            const data = {
+                name: document.getElementById('r-sw-name').value,
+                company: document.getElementById('r-co-name').value,
+                devDate: document.getElementById('r-dev-date').value,
+                hostDate: document.getElementById('r-host-date').value,
+                dbName: document.getElementById('r-db-name').value,
+                type: document.getElementById('r-type').value,
+                link: document.getElementById('r-link').value,
+                devName: document.getElementById('r-dev-name').value
+            };
+            if(!data.name) return alert("Enter Name!");
+            push(ref(db, 'softwares'), data).then(() => {
+                alert("Registration Successful!");
+                navTo('dash');
+            });
+        };
+
+        window.loadTable = function() {
+            onValue(ref(db, 'softwares'), (snapshot) => {
+                const tbody = document.getElementById('data-tbody');
+                tbody.innerHTML = "";
+                let i = 1;
+                snapshot.forEach((child) => {
+                    const sw = child.val();
+                    const key = child.key;
+                    tbody.innerHTML += `
+                        <tr class="border-b">
+                            <td class="p-3 border">${i++}</td>
+                            <td class="p-3 border font-bold">${sw.name}</td>
+                            <td class="p-3 border">${sw.company}</td>
+                            <td class="p-3 border">${sw.type}</td>
+                            <td class="p-3 border">
+                                ${sw.link ? `<button onclick="copyLink('${sw.link}')" class="text-blue-600 hover:underline">${sw.link} <i class="fas fa-copy ml-1"></i></button>` : 'N/A'}
+                            </td>
+                        </tr>`;
+                });
+            });
+        };
+
+        window.detailedSearch = function() {
+            const query = document.getElementById('s-query').value.toLowerCase();
+            onValue(ref(db, 'softwares'), (snapshot) => {
+                let found = null;
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    if(data.name.toLowerCase().includes(query) || data.company.toLowerCase().includes(query)) {
+                        found = { ...data, key: child.key };
+                    }
+                });
+                if(found) {
+                    window.currentEditKey = found.key;
+                    document.getElementById('s-result').classList.remove('hidden');
+                    document.getElementById('s-info').innerHTML = `
+                        <p><strong>Software Name:</strong> ${found.name}</p>
+                        <p><strong>Institution:</strong> ${found.company}</p>
+                        <p><strong>Software Type:</strong> ${found.type}</p>
+                        <p><strong>Develop Date:</strong> ${found.devDate}</p>
+                        <p><strong>Hosting Date:</strong> ${found.hostDate}</p>
+                        <p><strong>Database Name:</strong> ${found.dbName}</p>
+                        <p><strong>Developer Name:</strong> ${found.devName}</p>
+                        <p><strong>Link:</strong> ${found.link || 'N/A'}</p>`;
+                } else { alert("No Record Found!"); }
+            }, { onlyOnce: true });
+        };
+
+        window.deleteData = function() {
+            if(confirm("Delete this record permanently?")) {
+                remove(ref(db, 'softwares/' + window.currentEditKey)).then(() => {
+                    alert("Deleted!");
+                    document.getElementById('s-result').classList.add('hidden');
+                });
+            }
+        };
+
+        window.editData = function() {
+            const newName = prompt("Enter New Software Name:");
+            if(newName) {
+                update(ref(db, 'softwares/' + window.currentEditKey), { name: newName }).then(() => {
+                    alert("Updated Successfully!");
+                    detailedSearch();
+                });
+            }
+        };
+    </script>
+
+    <script>
+        function handleLogin() {
+            if(document.getElementById('login-id').value === "Admin" && document.getElementById('login-pass').value === "202627") {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-portal').classList.remove('hidden-section');
+                initCal();
+            } else { alert("Wrong ID/Pass!"); }
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+
+        function navTo(sec) {
+            ['dash','reg','list','search','user'].forEach(s => document.getElementById(s+'-sec').classList.add('hidden-section'));
+            document.getElementById(sec+'-sec').classList.remove('hidden-section');
+            document.getElementById('sidebar').classList.remove('active'); // অটো ক্লোজ
+            if(sec === 'list') window.loadTable();
+        }
+
+        function checkType() {
+            const val = document.getElementById('r-type').value;
+            document.getElementById('r-link').classList.toggle('hidden', !(val==='Website' || val==='webApp'));
+        }
+
+        function copyLink(text) {
+            navigator.clipboard.writeText(text);
+            alert("Link Copied!");
+        }
+
+        function filterTable() {
+            const q = document.getElementById('l-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#data-tbody tr');
+            rows.forEach(r => r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none');
+        }
+
+        function saveUser() {
+            const n = document.getElementById('u-name').value;
+            document.getElementById('display-name').innerText = n;
+            alert("User Name Updated!");
+        }
+
+        function initCal() {
+            const d = new Date();
+            document.getElementById('cal-date').innerText = d.toLocaleString('default', { month: 'long' }) + " 2026";
+            let h = "";
+            for(let i=1; i<=31; i++) {
+                const today = i === d.getDate();
+                h += `<div class="p-2 border rounded-lg ${today ? 'bg-blue-600 text-white shadow-md' : 'bg-white'}">${i}</div>`;
+            }
+            document.getElementById('cal-grid').innerHTML = h;
+        }
+    </script>
+</body>
+</html>
